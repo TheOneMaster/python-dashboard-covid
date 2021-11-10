@@ -114,5 +114,7 @@ def updateGraph(cities, kind) -> go.Figure:
 
 
 if __name__ == "__main__":
-    app.run_server(port='8000')
+
+    print("Prod deployment")
+    app.run_server(port='8000', host="0.0.0.0")
 
