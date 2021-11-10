@@ -1,3 +1,4 @@
+from dash_core_components.Interval import Interval
 import pandas as pd
 
 import dash
@@ -7,7 +8,7 @@ from dash.dependencies import Output, Input
 import plotly.graph_objects as go
 
 
-def filterData() -> pd.DataFrame:
+def getData() -> pd.DataFrame:
 
     df = pd.read_csv("https://data.rivm.nl/covid-19/COVID-19_aantallen_gemeente_per_dag.csv", sep=';')
     df['cumulative'] = df.groupby(['Municipality_name'])['Total_reported'].cumsum()
@@ -47,31 +48,49 @@ def createLayout(cities, default_cities) -> html.Div:
         html.Div(children=[
             dcc.Graph(id='test_graph', figure=go.Figure(layout=dict(template='plotly_dark')),
                 style={"height": "100%"})], 
-            style={"flex-grow": "1", "display": "inline-block"})
+            style={"flex-grow": "1", "display": "inline-block"}),
+        
+        # Interval
+        dcc.Interval(id="data-update", interval=INTERVAL_TIME)
+
         ], style={"display": "flex", "height": "100vh"})
 
     return layout
 
-DATA = filterData()
+DATA = getData()
 DEFAULT_CITIES = ['Amsterdam', 'Rotterdam', 'Eindhoven','Tilburg']
 
+# Interval to update data with (Every day)
+INTERVAL_TIME = 1000 * 60 * 60 * 24
+N_INTERVALS = 0
+
 # Get sorted list of cities in the data
-cities = DATA['Municipality_name'].dropna().unique()
-cities.sort()
+CITIES = DATA['Municipality_name'].dropna().unique()
+CITIES.sort()
 
 stylesheet = ['https://codepen.io/chriddyp/pen/bWLwgP.css']
 app = dash.Dash(__name__, external_stylesheets=stylesheet)
 
-app.layout = createLayout(cities, DEFAULT_CITIES)
+app.layout = createLayout(CITIES, DEFAULT_CITIES)
 app.title = "COVID Dashboard - Netherlands"
 
 # Callbacks
 @app.callback(
     Output('test_graph', 'figure'),
     [Input('city-dropdown', 'value'),
-    Input('graph-type', 'value')])
-def updateGraph(cities, kind) -> go.Figure:
+    Input('graph-type', 'value'),
+    Input('data-update', 'n_intervals')])
+def updateGraph(cities, kind, n_intervals) -> go.Figure:
     
+    global DATA, N_INTERVALS
+
+    try:
+        if n_intervals > N_INTERVALS:
+            N_INTERVALS = n_intervals
+            DATA = getData()
+    except TypeError:
+        pass
+
     kind_map = {
         "CUM": "cumulative",
         "PD": "Total_reported"
@@ -112,9 +131,8 @@ def updateGraph(cities, kind) -> go.Figure:
 
     return fig
 
-
 if __name__ == "__main__":
 
     print("Prod deployment")
-    app.run_server(port='8000', host="0.0.0.0")
+    app.run_server(port='8000', debug=True)
 
