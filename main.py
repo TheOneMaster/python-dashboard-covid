@@ -133,6 +133,5 @@ def updateGraph(cities, kind, n_intervals) -> go.Figure:
 
 if __name__ == "__main__":
 
-    print("Prod deployment")
-    app.run_server(port='8000', debug=True)
+    app.run_server(port='8000', host='0.0.0.0')
 
