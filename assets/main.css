@@ -8,6 +8,8 @@ body{
     color: var(--text1);
 }
 
+/* Class CSS */
+
 .Select-control{
     background-color: var(--background-color);
     color: var(--text1);
@@ -16,3 +18,11 @@ body{
 .Select-menu-outer{
     background-color: var(--background-color);
 }
+
+/* ID CSS */
+
+input#city-dropdown{
+    color: var(--text1);
+}
+
+

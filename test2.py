@@ -25,7 +25,7 @@ def createLayout(cities, default_cities) -> html.Div:
         value=default_cities,
         placeholder="Select cities",
         style={
-            "background-color": "black"
+            "background-color": "var(--background-color)",
         })
 
     chart_type = dcc.RadioItems(
@@ -70,7 +70,7 @@ app.title = "COVID Dashboard - Netherlands"
     Output('test_graph', 'figure'),
     [Input('city-dropdown', 'value'),
     Input('graph-type', 'value')])
-def updateGraph(cities, kind):
+def updateGraph(cities, kind) -> go.Figure:
     
     kind_map = {
         "CUM": "cumulative",
