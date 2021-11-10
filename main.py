@@ -114,5 +114,5 @@ def updateGraph(cities, kind) -> go.Figure:
 
 
 if __name__ == "__main__":
-    app.run_server(debug=True)
+    app.run_server(port='8000')
 
