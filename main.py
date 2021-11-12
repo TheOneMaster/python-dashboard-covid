@@ -7,12 +7,13 @@ import dash
 import dash_core_components as dcc
 import dash_html_components as html
 from dash.dependencies import Output, Input
+from dash.exceptions import PreventUpdate
 import plotly.graph_objects as go
 
 DEFAULT_CITIES = ['Amsterdam', 'Rotterdam', 'Eindhoven','Tilburg']
 
 # Interval to update data with (Every day)
-INTERVAL_TIME = 1000 * 5
+INTERVAL_TIME = 1000 * 10
 N_INTERVALS = 0
 
 START_TIME = time.time()
@@ -60,14 +61,15 @@ def createLayout(cities, default_cities) -> html.Div:
             style={"flex-grow": "1", "display": "inline-block"}),
         
         # Interval
-        dcc.Interval(id="data-update", interval=INTERVAL_TIME)
+        dcc.Interval(id="data-update", interval=INTERVAL_TIME, N_INTERVALS=0),
+
+        html.Div(id="data-storage", children=[])
 
         ], style={"display": "flex", "height": "100vh"})
 
     return layout
 
 DATA = getData()
-
 
 # Get sorted list of cities in the data
 CITIES = DATA['Municipality_name'].dropna().unique()
@@ -83,21 +85,8 @@ app.title = "COVID Dashboard - Netherlands"
 @app.callback(
     Output('test_graph', 'figure'),
     [Input('city-dropdown', 'value'),
-    Input('graph-type', 'value'),
-    Input('data-update', 'n_intervals')])
-def updateGraph(cities, kind, n_intervals) -> go.Figure:
-    
-    global DATA, N_INTERVALS, START_TIME
-
-    try:
-        if n_intervals > N_INTERVALS:
-            N_INTERVALS = n_intervals
-            DATA = getData()
-            current_time = time.time()
-            print(f"updating_data: {START_TIME-current_time}")
-            START_TIME = current_time
-    except TypeError:
-        pass
+    Input('graph-type', 'value')])
+def updateGraph(cities, kind) -> go.Figure:
 
     kind_map = {
         "CUM": "cumulative",
@@ -138,6 +127,23 @@ def updateGraph(cities, kind, n_intervals) -> go.Figure:
         fig.add_trace(scatter)
 
     return fig
+
+@app.callback(
+    Output('data-storage', 'children'),
+    [Input('data-update', 'n_intervals')])
+def updateData(n_intervals):
+
+    if n_intervals is None:
+        raise PreventUpdate
+
+    global DATA, START_TIME
+
+    DATA = getData()
+    current_time = time.time()
+    print(f"Time taken: {current_time - START_TIME}")
+    START_TIME = current_time
+
+    return []
 
 if __name__ == "__main__":
 
