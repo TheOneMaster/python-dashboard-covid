@@ -61,7 +61,7 @@ def createLayout(cities, default_cities) -> html.Div:
             style={"flex-grow": "1", "display": "inline-block"}),
         
         # Interval
-        dcc.Interval(id="data-update", interval=INTERVAL_TIME, N_INTERVALS=0),
+        dcc.Interval(id="data-update", interval=INTERVAL_TIME, n_intervals=0),
 
         html.Div(id="data-storage", children=[])
 
