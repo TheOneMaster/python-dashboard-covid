@@ -1,3 +1,5 @@
+import time
+
 from dash_core_components.Interval import Interval
 import pandas as pd
 
@@ -7,6 +9,13 @@ import dash_html_components as html
 from dash.dependencies import Output, Input
 import plotly.graph_objects as go
 
+DEFAULT_CITIES = ['Amsterdam', 'Rotterdam', 'Eindhoven','Tilburg']
+
+# Interval to update data with (Every day)
+INTERVAL_TIME = 1000 * 5
+N_INTERVALS = 0
+
+START_TIME = time.time()
 
 def getData() -> pd.DataFrame:
 
@@ -58,11 +67,7 @@ def createLayout(cities, default_cities) -> html.Div:
     return layout
 
 DATA = getData()
-DEFAULT_CITIES = ['Amsterdam', 'Rotterdam', 'Eindhoven','Tilburg']
 
-# Interval to update data with (Every day)
-INTERVAL_TIME = 1000 * 60 * 60 * 24
-N_INTERVALS = 0
 
 # Get sorted list of cities in the data
 CITIES = DATA['Municipality_name'].dropna().unique()
@@ -82,12 +87,15 @@ app.title = "COVID Dashboard - Netherlands"
     Input('data-update', 'n_intervals')])
 def updateGraph(cities, kind, n_intervals) -> go.Figure:
     
-    global DATA, N_INTERVALS
+    global DATA, N_INTERVALS, START_TIME
 
     try:
         if n_intervals > N_INTERVALS:
             N_INTERVALS = n_intervals
             DATA = getData()
+            current_time = time.time()
+            print(f"updating_data: {START_TIME-current_time}")
+            START_TIME = current_time
     except TypeError:
         pass
 
