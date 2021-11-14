@@ -13,7 +13,7 @@ import plotly.graph_objects as go
 DEFAULT_CITIES = ['Amsterdam', 'Rotterdam', 'Eindhoven','Tilburg']
 
 # Interval to update data with (Every day)
-INTERVAL_TIME = 1000 * 10
+INTERVAL_TIME = 1000 * 60 * 60
 N_INTERVALS = 0
 
 START_TIME = time.time()
