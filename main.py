@@ -86,7 +86,7 @@ app.title = "COVID Dashboard - Netherlands"
     Output('test_graph', 'figure'),
     [Input('city-dropdown', 'value'),
     Input('graph-type', 'value')])
-def updateGraph(cities, kind, _) -> go.Figure:
+def updateGraph(cities, kind) -> go.Figure:
 
     kind_map = {
         "CUM": "cumulative",
