@@ -85,8 +85,9 @@ app.title = "COVID Dashboard - Netherlands"
 @app.callback(
     Output('test_graph', 'figure'),
     [Input('city-dropdown', 'value'),
-    Input('graph-type', 'value')])
-def updateGraph(cities, kind) -> go.Figure:
+    Input('graph-type', 'value'),
+    Input('data-storage', 'children')])
+def updateGraph(cities, kind, _) -> go.Figure:
 
     kind_map = {
         "CUM": "cumulative",
