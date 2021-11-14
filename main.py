@@ -63,7 +63,7 @@ def createLayout(cities, default_cities) -> html.Div:
         # Interval
         dcc.Interval(id="data-update", interval=INTERVAL_TIME, n_intervals=0),
 
-        html.Div(id="data-storage", children=[])
+        html.Div(id="data-storage", children=[], style={"display": "none"})
 
         ], style={"display": "flex", "height": "100vh"})
 
@@ -139,11 +139,11 @@ def updateData(n_intervals):
     global DATA, START_TIME
 
     DATA = getData()
-    current_time = time.time()
-    print(f"Time taken: {current_time - START_TIME}")
-    START_TIME = current_time
 
-    return []
+    current_time = time.time()
+    total_time = current_time - START_TIME
+
+    return f"{total_time}s"
 
 if __name__ == "__main__":
 
