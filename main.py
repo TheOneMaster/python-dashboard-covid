@@ -1,6 +1,6 @@
 import time
 
-from dash_core_components.Interval import Interval
+from dash_core_components import Interval
 import pandas as pd
 
 import dash
@@ -62,7 +62,6 @@ def createLayout(cities, default_cities) -> html.Div:
         
         # Interval
         dcc.Interval(id="data-update", interval=INTERVAL_TIME, n_intervals=0),
-
         html.Div(id="data-storage", children=[], style={"display": "none"})
 
         ], style={"display": "flex", "height": "100vh"})
