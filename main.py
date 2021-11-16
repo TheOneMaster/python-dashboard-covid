@@ -23,9 +23,12 @@ def getData() -> pd.DataFrame:
     df = pd.read_csv("https://data.rivm.nl/covid-19/COVID-19_aantallen_gemeente_per_dag.csv", sep=';')
     df['cumulative'] = df.groupby(['Municipality_name'])['Total_reported'].cumsum()
 
-    columns = ['Date_of_publication','Municipality_name', 'Total_reported', 'cumulative']
+    df = df.groupby(['Municipality_name', 'Date_of_publication'], as_index=False).agg({
+        'Total_reported': 'sum',
+        'cumulative': 'last'
+    })
 
-    return df[columns]
+    return df
 
 def createLayout(cities, default_cities) -> html.Div:
 
