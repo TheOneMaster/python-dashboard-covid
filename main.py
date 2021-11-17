@@ -100,24 +100,34 @@ def updateGraph(cities, kind) -> go.Figure:
         "PD": "Number of cases per day" 
     }
 
+    selector_options = {
+        'buttons': [
+            dict(count=1, label='1M', step='month', stepmode='backward'),
+            dict(count=6, label='6M', step='month', stepmode='backward'),
+            dict(count=1, label='1Y', step='year', stepmode='backward'),
+            dict(label='All', step='all')],
+        'bgcolor': "hsl(0, 0%, 20%)",
+
+    }
+
+
     number_data = kind_map[kind]
     grouped_data = DATA.groupby('Municipality_name')
 
     ylabel = y_axes[kind]
     layout = go.Layout(
         title='Covid Infections in the Netherlands',
-        xaxis=dict(
-            title='Date',
-            showgrid=False),
-        yaxis=dict(
-            title=ylabel,
-            showgrid=False),
+        xaxis=dict(title='Date', rangeselector=selector_options),
+        yaxis=dict(title=ylabel),
         hovermode='x unified',
         template='plotly_dark',
         paper_bgcolor='#121212',
         plot_bgcolor='#121212')
     
     fig = go.Figure(layout=layout)
+
+    fig.update_xaxes(showline=True, showgrid=False)
+    fig.update_yaxes(showline=True, showgrid=True, rangemode='tozero', gridcolor='hsl(0, 0%, 40%)')
 
     for city in cities:
 
@@ -149,9 +159,5 @@ def updateData(n_intervals):
 
 if __name__ == "__main__":
 
-<<<<<<< HEAD
-    app.run_server(port='8000', host='0.0.0.0')
-=======
     app.run_server(port='8000', host="0.0.0.0")
->>>>>>> 380b140840e4b4376c1a2defc7f1b809bdc062e0
 
