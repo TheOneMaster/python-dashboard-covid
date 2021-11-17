@@ -106,8 +106,7 @@ def updateGraph(cities, kind) -> go.Figure:
             dict(count=6, label='6M', step='month', stepmode='backward'),
             dict(count=1, label='1Y', step='year', stepmode='backward'),
             dict(label='All', step='all')],
-        'bgcolor': "hsl(0, 0%, 20%)",
-
+        'bgcolor': "hsl(0, 0%, 20%)"
     }
 
 
