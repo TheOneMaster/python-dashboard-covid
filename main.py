@@ -1,21 +1,34 @@
-from dash_core_components.Interval import Interval
+import time
+
+from dash_core_components import Interval
 import pandas as pd
 
 import dash
 import dash_core_components as dcc
 import dash_html_components as html
 from dash.dependencies import Output, Input
+from dash.exceptions import PreventUpdate
 import plotly.graph_objects as go
 
+DEFAULT_CITIES = ['Amsterdam', 'Rotterdam', 'Eindhoven','Tilburg']
+
+# Interval to update data with (Every day)
+INTERVAL_TIME = 1000 * 60 * 60
+N_INTERVALS = 0
+
+START_TIME = time.time()
 
 def getData() -> pd.DataFrame:
 
     df = pd.read_csv("https://data.rivm.nl/covid-19/COVID-19_aantallen_gemeente_per_dag.csv", sep=';')
     df['cumulative'] = df.groupby(['Municipality_name'])['Total_reported'].cumsum()
 
-    columns = ['Date_of_publication','Municipality_name', 'Total_reported', 'cumulative']
+    df = df.groupby(['Municipality_name', 'Date_of_publication'], as_index=False).agg({
+        'Total_reported': 'sum',
+        'cumulative': 'last'
+    })
 
-    return df[columns]
+    return df
 
 def createLayout(cities, default_cities) -> html.Div:
 
@@ -51,18 +64,14 @@ def createLayout(cities, default_cities) -> html.Div:
             style={"flex-grow": "1", "display": "inline-block"}),
         
         # Interval
-        dcc.Interval(id="data-update", interval=INTERVAL_TIME)
+        dcc.Interval(id="data-update", interval=INTERVAL_TIME, n_intervals=0),
+        html.Div(id="data-storage", children=[], style={"display": "none"})
 
         ], style={"display": "flex", "height": "100vh"})
 
     return layout
 
 DATA = getData()
-DEFAULT_CITIES = ['Amsterdam', 'Rotterdam', 'Eindhoven','Tilburg']
-
-# Interval to update data with (Every day)
-INTERVAL_TIME = 1000 * 60 * 60 * 24
-N_INTERVALS = 0
 
 # Get sorted list of cities in the data
 CITIES = DATA['Municipality_name'].dropna().unique()
@@ -78,18 +87,8 @@ app.title = "COVID Dashboard - Netherlands"
 @app.callback(
     Output('test_graph', 'figure'),
     [Input('city-dropdown', 'value'),
-    Input('graph-type', 'value'),
-    Input('data-update', 'n_intervals')])
-def updateGraph(cities, kind, n_intervals) -> go.Figure:
-    
-    global DATA, N_INTERVALS
-
-    try:
-        if n_intervals > N_INTERVALS:
-            N_INTERVALS = n_intervals
-            DATA = getData()
-    except TypeError:
-        pass
+    Input('graph-type', 'value')])
+def updateGraph(cities, kind) -> go.Figure:
 
     kind_map = {
         "CUM": "cumulative",
@@ -131,7 +130,28 @@ def updateGraph(cities, kind, n_intervals) -> go.Figure:
 
     return fig
 
+@app.callback(
+    Output('data-storage', 'children'),
+    [Input('data-update', 'n_intervals')])
+def updateData(n_intervals):
+
+    if n_intervals is None:
+        raise PreventUpdate
+
+    global DATA, START_TIME
+
+    DATA = getData()
+
+    current_time = time.time()
+    total_time = current_time - START_TIME
+
+    return f"{total_time}s"
+
 if __name__ == "__main__":
 
+<<<<<<< HEAD
     app.run_server(port='8000', host='0.0.0.0')
+=======
+    app.run_server(port='8000', host="0.0.0.0")
+>>>>>>> 380b140840e4b4376c1a2defc7f1b809bdc062e0
 
