@@ -87,8 +87,9 @@ app.title = "COVID Dashboard - Netherlands"
 @app.callback(
     Output('test_graph', 'figure'),
     [Input('city-dropdown', 'value'),
-    Input('graph-type', 'value')])
-def updateGraph(cities, kind) -> go.Figure:
+    Input('graph-type', 'value'),
+    Input('data-storage', 'children')])
+def updateGraph(cities, kind, _) -> go.Figure:
 
     kind_map = {
         "CUM": "cumulative",
@@ -154,7 +155,7 @@ def updateData(n_intervals):
     current_time = time.time()
     total_time = current_time - START_TIME
 
-    return f"{total_time}s"
+    return [f"{total_time}s"]
 
 if __name__ == "__main__":
 
