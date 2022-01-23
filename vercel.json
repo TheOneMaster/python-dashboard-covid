@@ -3,13 +3,13 @@
     "builds": [
         {
             "src": "./index.py",
-            "use": "@vercel/python"
+            "use": "@ardnt/vercel-python-wsgi"
         }
     ],
     "routes": [
         {
             "src": "/(.*)",
-            "dest": "/"
+            "dest": "/index.py"
         }
     ]
 }
