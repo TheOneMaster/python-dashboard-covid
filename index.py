@@ -10,6 +10,8 @@ from dash.dependencies import Output, Input
 from dash.exceptions import PreventUpdate
 import plotly.graph_objects as go
 
+import flask
+
 DEFAULT_CITIES = ['Amsterdam', 'Rotterdam', 'Eindhoven','Tilburg']
 
 # Interval to update data with (Every 12 hours)
@@ -76,7 +78,13 @@ CITIES = DATA['Municipality_name'].dropna().unique()
 CITIES.sort()
 
 stylesheet = ['https://codepen.io/chriddyp/pen/bWLwgP.css']
-app = dash.Dash(__name__, external_stylesheets=stylesheet)
+
+server = flask.Flask(__name__)
+
+
+app = dash.Dash(
+    __name__, external_stylesheets=stylesheet,
+    server=server, url_base_pathname="/dash/")
 
 app.layout = createLayout(CITIES, DEFAULT_CITIES)
 app.title = "COVID Dashboard - Netherlands"
@@ -155,7 +163,6 @@ def updateData(n_intervals):
     return [f"Data update time: {end-start:.3f}s"]
 
 
-if __name__ == "__main__":
-
-    app.run_server(port='8000', host="0.0.0.0")
-
+@server.route("/dash")
+def my_dash_app():
+    return app.index()
