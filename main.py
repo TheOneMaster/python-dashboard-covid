@@ -12,9 +12,8 @@ import plotly.graph_objects as go
 
 DEFAULT_CITIES = ['Amsterdam', 'Rotterdam', 'Eindhoven','Tilburg']
 
-# Interval to update data with (Every day)
-INTERVAL_TIME = 1000 * 60 * 60
-N_INTERVALS = 0
+# Interval to update data with (Every 12 hours)
+INTERVAL_TIME = 1000 * 60 * 60 * 12
 
 START_TIME = time.time()
 
@@ -72,7 +71,6 @@ def createLayout(cities, default_cities) -> html.Div:
     return layout
 
 DATA = getData()
-
 # Get sorted list of cities in the data
 CITIES = DATA['Municipality_name'].dropna().unique()
 CITIES.sort()
@@ -87,9 +85,8 @@ app.title = "COVID Dashboard - Netherlands"
 @app.callback(
     Output('test_graph', 'figure'),
     [Input('city-dropdown', 'value'),
-    Input('graph-type', 'value'),
-    Input('data-storage', 'children')])
-def updateGraph(cities, kind, _) -> go.Figure:
+    Input('graph-type', 'value')])
+def updateGraph(cities, kind) -> go.Figure:
 
     kind_map = {
         "CUM": "cumulative",
@@ -142,20 +139,21 @@ def updateGraph(cities, kind, _) -> go.Figure:
 
 @app.callback(
     Output('data-storage', 'children'),
-    [Input('data-update', 'n_intervals')])
+    Input('data-update', 'n_intervals'))
 def updateData(n_intervals):
+
+    global DATA
 
     if n_intervals is None:
         raise PreventUpdate
 
-    global DATA, START_TIME
-
+    start = time.time()
     DATA = getData()
+    
+    end = time.time()
 
-    current_time = time.time()
-    total_time = current_time - START_TIME
+    return [f"Data update time: {end-start:.3f}s"]
 
-    return [f"{total_time}s"]
 
 if __name__ == "__main__":
 
