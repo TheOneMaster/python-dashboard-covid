@@ -3,7 +3,7 @@
   "builds": [
       {
           "src": "*.py",
-          "use": "@TheOneMaster/python-dashboard-covid"
+          "use": "@liudonghua123/now-flask"
       }
   ],
   "routes": [
